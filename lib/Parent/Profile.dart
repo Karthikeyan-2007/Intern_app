@@ -29,12 +29,6 @@ class _ParentProfilePageState extends State<ParentProfilePage> {
     },
   ];
 
-  final List<Map<String, dynamic>> _quickStats = [
-    {'label': 'Children', 'value': '2', 'icon': Icons.family_restroom, 'color': Colors.blue},
-    {'label': 'Messages', 'value': '3', 'icon': Icons.chat_bubble_outline, 'color': Colors.green},
-    {'label': 'Alerts', 'value': '1', 'icon': Icons.notifications_active, 'color': Colors.orange},
-  ];
-
   bool _notificationsEnabled = true;
   bool _twoFactorEnabled = false;
 
@@ -243,7 +237,7 @@ class _ParentProfilePageState extends State<ParentProfilePage> {
         child: Column(
           children: [
             Container(
-              height: 220,
+              height: 200,
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [Colors.blue.shade800, Colors.blue.shade600],
@@ -318,45 +312,6 @@ class _ParentProfilePageState extends State<ParentProfilePage> {
               ),
             ),
             const SizedBox(height: 24),
-
-            // Quick Stats
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: _quickStats.map((stat) {
-                  return Column(
-                    children: [
-                      Container(
-                        width: 60,
-                        height: 60,
-                        decoration: BoxDecoration(
-                          color: (stat['color'] as Color).withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(18),
-                        ),
-                        child: Icon(
-                          stat['icon'] as IconData,
-                          color: stat['color'] as Color,
-                          size: 28,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        stat['value'] as String,
-                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-                      ),
-                      Text(
-                        stat['label'] as String,
-                        style: TextStyle(fontSize: 12, color: Colors.grey[600]),
-                      ),
-                    ],
-                  );
-                }).toList(),
-              ),
-            ),
-            const SizedBox(height: 28),
-
-            // Children Section
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Row(
@@ -368,7 +323,7 @@ class _ParentProfilePageState extends State<ParentProfilePage> {
                   ),
                   TextButton(
                     onPressed: () {},
-                    child: const Text('View All', style: TextStyle(color: Colors.blue)),
+                    child: const Text('2', style: TextStyle(color: Colors.blue)),
                   ),
                 ],
               ),
@@ -377,8 +332,6 @@ class _ParentProfilePageState extends State<ParentProfilePage> {
             ..._children.map(_buildChildCard),
 
             const SizedBox(height: 16),
-
-            // Settings Section
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Column(
@@ -435,38 +388,48 @@ class _ParentProfilePageState extends State<ParentProfilePage> {
                   ),
                   const SizedBox(height: 20),
                   Center(
-                    child: OutlinedButton.icon(
-                      onPressed: () {
-                        showDialog(
-                          context: context,
-                          builder: (context) => AlertDialog(
-                            title: const Text('Logout'),
-                            content: const Text('Are you sure you want to log out?'),
-                            actions: [
-                              TextButton(
-                                onPressed: Navigator.of(context).pop,
-                                child: const Text('Cancel'),
-                              ),
-                              TextButton(
-                                onPressed: () {
-                                  Navigator.pushReplacement(
-                                    context,
-                                    MaterialPageRoute(builder: (context) => Loginscreen()),
-                                  );
-                                },
-                                child: const Text('Logout', style: TextStyle(color: Colors.red)),
-                              ),
-                            ],
-                          ),
+                    child:GestureDetector(
+                      onTap: () {
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(builder: (context) => Loginscreen()),
                         );
                       },
-                      icon: const Icon(Icons.logout, color: Colors.red),
-                      label: const Text('Log Out', style: TextStyle(color: Colors.red)),
-                      style: OutlinedButton.styleFrom(
-                        side: const BorderSide(color: Colors.red),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                      child: Container(
+                        margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(30),
+                          gradient: const LinearGradient(
+                            colors: [Color(0xFFFF416C), Color(0xFFFF4B2B)],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.red.withOpacity(0.4),
+                              blurRadius: 12,
+                              offset: const Offset(0, 6),
+                            ),
+                          ],
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: const [
+                            Icon(Icons.logout, color: Colors.white),
+                            SizedBox(width: 10),
+                            Text(
+                              "Sign Out",
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 18,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
+                    )
                   ),
                   const SizedBox(height: 40),
                 ],

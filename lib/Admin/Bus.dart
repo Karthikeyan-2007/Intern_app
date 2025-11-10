@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:school_app/LoginScreen/LoginScreen.dart';
 
 class BusTransportManagement extends StatefulWidget {
   @override
@@ -26,22 +27,58 @@ class _BusTransportManagementState extends State<BusTransportManagement> {
           padding: EdgeInsets.all(16.0),
           child: Column(
             children: [
-              // Stats Summary Cards
               _buildStatsSummary(),
               SizedBox(height: 24),
-              
-              // Search and Filter Row
               _buildSearchFilterRow(),
               SizedBox(height: 24),
-              
-              // Expense Alert Banner
-              if (_expenseThisMonth > 8000.0) // Monthly budget threshold
+              if (_expenseThisMonth > 8000.0)
                 _buildExpenseAlertBanner(),
               
               SizedBox(height: 16),
-              
-              // Buses List
               _buildBusesList(),
+              SizedBox(height: 24),
+              GestureDetector(
+                onTap: () {
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (context) => Loginscreen()),
+                  );
+                },
+                child: Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(30),
+                    gradient: const LinearGradient(
+                      colors: [Color(0xFFFF416C), Color(0xFFFF4B2B)],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.red.withOpacity(0.4),
+                        blurRadius: 12,
+                        offset: const Offset(0, 6),
+                      ),
+                    ],
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: const [
+                      Icon(Icons.logout, color: Colors.white),
+                      SizedBox(width: 10),
+                      Text(
+                        "Sign Out",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
             ],
           ),
         ),

@@ -78,59 +78,92 @@ class _AdminTeacherManagerState extends State<AdminTeacherManager> {
           SizedBox(height: 10),
 
           Expanded(
-            child: DataTable(
-              headingRowColor: MaterialStateProperty.all(Color(0xFF6E8AFA)),
-              headingTextStyle: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-              columns: [
-                DataColumn(label: Text("Name")),
-                DataColumn(label: Text(isStudent ? "Class" : "Dept")),
-                DataColumn(label: Text("Phone")),
-                DataColumn(label: Text("Status")),
-                DataColumn(label: Text("Actions")),
-              ],
-              rows: filteredList.map((item) {
-                return DataRow(
-                  cells: [
-                    DataCell(Text(item.name)),
-                    DataCell(Text(isStudent ? item.classSection : item.department)),
-                    DataCell(Text(item.phone)),
-                    DataCell(
-                      Container(
-                        padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(12),
-                          color: item.status == "Active"
-                              ? Color(0xFF4ECDC4)
-                              : Color(0xFFFF6B6B),
+  child: filteredList.isEmpty
+      ? Center(child: Text("No data found"))
+      : ListView.builder(
+          itemCount: filteredList.length,
+          itemBuilder: (context, index) {
+            final item = filteredList[index];
+
+            return Card(
+              elevation: 3,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              margin: EdgeInsets.only(bottom: 12),
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // NAME
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          item.name,
+                          style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold),
                         ),
-                        child: Text(item.status, style: TextStyle(color: Colors.white)),
-                      ),
+                        Container(
+                          padding: EdgeInsets.symmetric(
+                              horizontal: 10, vertical: 5),
+                          decoration: BoxDecoration(
+                            color: item.status == "Active"
+                                ? Color(0xFF4ECDC4)
+                                : Color(0xFFFF6B6B),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Text(
+                            item.status,
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                      ],
                     ),
-                    DataCell(
-                      Row(
-                        children: [
-                          IconButton(
-                              icon: Icon(Icons.edit, color: Colors.blue),
-                              onPressed: () => _showAddEditDialog(isStudent: isStudent, data: item)),
-                          IconButton(
-                              icon: Icon(Icons.delete, color: Colors.red),
-                              onPressed: () => _deleteItem(item, isStudent)),
-                        ],
-                      ),
+                    Text(
+                      isStudent
+                          ? "Class : ${item.classSection}"
+                          : "Department : ${item.department}",
+                      style: TextStyle(fontSize: 15),
+                    ),
+
+                    SizedBox(height: 4),
+
+                    // PHONE
+                    Text(
+                      "Phone : ${item.phone}",
+                      style: TextStyle(fontSize: 15),
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        IconButton(
+                          icon: Icon(Icons.edit, color: Colors.blue),
+                          onPressed: () => _showAddEditDialog(
+                              isStudent: isStudent, data: item),
+                        ),
+                        IconButton(
+                          icon: Icon(Icons.delete, color: Colors.red),
+                          onPressed: () => _deleteItem(item, isStudent),
+                        ),
+                      ],
                     ),
                   ],
-                );
-              }).toList(),
-            ),
-          )
+                ),
+              ),
+            );
+          },
+        ),
+)
+
         ],
       ),
     );
   }
-
-  // ******************************************************
-  // SEARCH FIELD
-  // ******************************************************
   Widget _buildSearchBar() {
     return TextField(
       controller: searchController,
@@ -144,10 +177,6 @@ class _AdminTeacherManagerState extends State<AdminTeacherManager> {
       ),
     );
   }
-
-  // ******************************************************
-  // FILTER CONTAINER
-  // ******************************************************
   Widget _buildFilterRow(bool isStudent) {
     return Row(
       children: [
@@ -181,9 +210,6 @@ class _AdminTeacherManagerState extends State<AdminTeacherManager> {
   InputDecoration _dropdownDecoration() => InputDecoration(
       filled: true, fillColor: Colors.white, border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)));
 
-  // ******************************************************
-  // ADD / EDIT DIALOG
-  // ******************************************************
   void _showAddEditDialog({required bool isStudent, dynamic data}) {
     TextEditingController name = TextEditingController(text: data?.name);
     TextEditingController classOrDept =
@@ -248,10 +274,6 @@ class _AdminTeacherManagerState extends State<AdminTeacherManager> {
         controller: controller,
         decoration: InputDecoration(hintText: hint, border: OutlineInputBorder(borderRadius: BorderRadius.circular(12))),
       );
-
-  // ******************************************************
-  // DELETE CONFIRMATION
-  // ******************************************************
   _deleteItem(dynamic item, bool isStudent) {
     showDialog(
       context: context,
@@ -276,9 +298,6 @@ class _AdminTeacherManagerState extends State<AdminTeacherManager> {
   }
 }
 
-// ************************************************************
-// DATA MODELS + SAMPLE DATA
-// ************************************************************
 class Student {
   String name;
   String classSection;

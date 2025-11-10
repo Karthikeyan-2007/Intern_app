@@ -64,15 +64,6 @@ class StudentProfileWithParents extends StatelessWidget {
           preferredSize: const Size.fromHeight(1),
           child: Container(color: Colors.blue.shade200, height: 1),
         ),
-        actions: [
-          IconButton(
-            onPressed: () {
-              // TODO: Edit profile or settings
-            },
-            icon: const Icon(Icons.settings_outlined),
-            color: Colors.blue.shade700,
-          ),
-        ],
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -82,7 +73,6 @@ class StudentProfileWithParents extends StatelessWidget {
               constraints: const BoxConstraints(maxWidth: 600),
               child: Column(
                 children: [
-                  // === STUDENT PROFILE CARD ===
                   _buildProfileCard(
                     title: 'Student Information',
                     color: Colors.blue.shade700,

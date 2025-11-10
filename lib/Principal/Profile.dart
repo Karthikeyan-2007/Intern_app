@@ -202,7 +202,6 @@ class _PrincipalProfilePageState extends State<PrincipalProfilePage> with Single
                 ),
               ],
             ),
-            const SizedBox(height: 16),
             TabBar(
               controller: _tabController,
               labelColor: Colors.white,
@@ -557,12 +556,6 @@ class _PrincipalProfilePageState extends State<PrincipalProfilePage> with Single
     }
   }
 
-  // Announcement, Profile, Settings, etc. — same as your original (kept for brevity)
-  // ... [Include your existing _openCreateAnnouncement, _openEditAnnouncement, _openEditProfile, _showSettingsMenu, etc.]
-
-  // =============== Reuse your existing methods below ===============
-  // (We keep them identical to your working logic — just ensure they're included)
-
   Future<void> _openCreateAnnouncement() async {
     final result = await showModalBottomSheet<Announcement>(
       context: context,
@@ -697,7 +690,12 @@ class _PrincipalProfilePageState extends State<PrincipalProfilePage> with Single
             ListTile(leading: const Icon(Icons.security), title: const Text('Security'), subtitle: const Text('Change password, 2FA'), onTap: () {Navigator.pop(context); _showSuccess('Security settings opened');}),
             ListTile(leading: const Icon(Icons.cloud_upload), title: const Text('Sync Now'), subtitle: const Text('Sync events & announcements'), onTap: () {Navigator.pop(context); _showSuccess('Sync complete (mock)');}),
             const Divider(),
-            ListTile(leading: const Icon(Icons.logout, color: Colors.red), title: const Text('Sign Out', style: TextStyle(color: Colors.red)), onTap: () {Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=> Loginscreen()));}),
+            ListTile(leading: const Icon(Icons.logout, color: Colors.red), title: const Text('Sign Out', style: TextStyle(color: Colors.red)), onTap: () {Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(builder: (context) => Loginscreen()),
+              (route) => false,      // ⬅ Clears entire navigation stack
+              );
+            }),
             SizedBox(height: 50,)
           ],
         ),
@@ -712,20 +710,6 @@ class _PrincipalProfilePageState extends State<PrincipalProfilePage> with Single
         title: const Text('SchoolSync Admin'),
         content: const Text('Version 2.1.0\n\nA comprehensive school management platform for principals, teachers, and staff.'),
         actions: [TextButton(onPressed: () => Navigator.pop(context), child: const Text('OK'))],
-      ),
-    );
-  }
-
-  void _logout() {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Confirm Sign Out'),
-        content: const Text('Are you sure you want to sign out?'),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
-          TextButton(onPressed: () {Navigator.of(context).popUntil((route) => route.isFirst);}, child: const Text('Sign Out', style: TextStyle(color: Colors.red))),
-        ],
       ),
     );
   }

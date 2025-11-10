@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:school_app/Staff/Alert.dart';
 import 'package:school_app/Staff/Notes.dart';
 
 class TeacherHomePage extends StatefulWidget {
@@ -129,20 +130,14 @@ class _TeacherHomePageState extends State<TeacherHomePage> {
                   Container(
                     margin: EdgeInsets.only(right: 8),
                     child: IconButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        Navigator.push(context, MaterialPageRoute(builder: (context)=>NotificationListPage()));
+                      },
                       icon: Icon(Icons.notifications_rounded, color: Colors.white),
                       tooltip: "Notifications",
                     ),
                   ),
                 ],
-              ),
-              Container(
-                margin: EdgeInsets.only(right: 16),
-                child: IconButton(
-                  onPressed: () {},
-                  icon: Icon(Icons.menu_rounded, color: Colors.white),
-                  tooltip: "Menu",
-                ),
               ),
             ],
           ),
@@ -221,11 +216,6 @@ class _TeacherHomePageState extends State<TeacherHomePage> {
                         ),
                       ],
                     ),
-                  ),
-                  IconButton(
-                    onPressed: () {
-                    },
-                    icon: const Icon(Icons.edit, color: Color(0xFF64748B)),
                   ),
                 ],
               ),

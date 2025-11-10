@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'dart:math';
 
 class FeesFinancePage extends StatefulWidget {
   @override
@@ -8,12 +7,14 @@ class FeesFinancePage extends StatefulWidget {
 
 class _FeesFinancePageState extends State<FeesFinancePage> {
   int _currentTab = 0;
+  TextEditingController searchController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
       length: 2,
       child: Scaffold(
+        backgroundColor: Color(0xFFF4F6FF),
         appBar: AppBar(
           backgroundColor: Color(0xFF6E8AFA),
           elevation: 0,
@@ -33,101 +34,33 @@ class _FeesFinancePageState extends State<FeesFinancePage> {
             ],
           ),
         ),
-        body: _currentTab == 0 ? _buildStudentFeesSection() : _buildTeacherSalarySection(),
+        body: _currentTab == 0
+            ? _buildStudentFeesSection()
+            : _buildTeacherSalarySection(),
       ),
     );
   }
 
   Widget _buildStudentFeesSection() {
     return Padding(
-      padding: EdgeInsets.all(16.0),
+      padding: EdgeInsets.all(16),
       child: Column(
         children: [
-          // Summary Cards
           _buildSummaryCards(),
+
           SizedBox(height: 16),
-          
-          // Search Bar
-          Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(12),
-              color: Colors.white,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.05),
-                  blurRadius: 10,
-                  offset: Offset(0, 5),
-                )
-              ],
-            ),
-            child: TextField(
-              decoration: InputDecoration(
-                hintText: "Search student by name/roll...",
-                prefixIcon: Icon(Icons.search, color: Color(0xFF6E8AFA)),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide.none,
-                ),
-                filled: true,
-                fillColor: Colors.white,
-              ),
-            ),
-          ),
+
+          _buildSearchBar(),
+
           SizedBox(height: 16),
-          
-          // Data Table
+
           Expanded(
-            child: DataTable(
-              headingRowColor: MaterialStateProperty.all(Color(0xFF6E8AFA)),
-              headingTextStyle: TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-              ),
-              columns: [
-                DataColumn(label: Text("Student")),
-                DataColumn(label: Text("Class")),
-                DataColumn(label: Text("Amount")),
-                DataColumn(label: Text("Status")),
-                DataColumn(label: Text("Actions")),
-              ],
-              rows: sampleStudentFees.map((fee) {
-                return DataRow(
-                  cells: [
-                    DataCell(Text(fee.studentName)),
-                    DataCell(Text(fee.classSection)),
-                    DataCell(Text("\$${fee.amount.toStringAsFixed(2)}")),
-                    DataCell(
-                      Container(
-                        padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                        decoration: BoxDecoration(
-                          color: fee.status == "Paid" 
-                              ? Color(0xFF4ECDC4) 
-                              : Color(0xFFFF6B6B),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Text(
-                          fee.status,
-                          style: TextStyle(color: Colors.white),
-                        ),
-                      ),
-                    ),
-                    DataCell(
-                      Row(
-                        children: [
-                          IconButton(
-                            icon: Icon(Icons.payments, color: Color(0xFF6E8AFA)),
-                            onPressed: () => _showPaymentSheet(fee),
-                          ),
-                          IconButton(
-                            icon: Icon(Icons.picture_as_pdf, color: Colors.red),
-                            onPressed: () => _generateReceipt(fee),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                );
-              }).toList(),
+            child: ListView.builder(
+              itemCount: sampleStudentFees.length,
+              itemBuilder: (context, index) {
+                final fee = sampleStudentFees[index];
+                return _buildFeeCard(fee);
+              },
             ),
           ),
         ],
@@ -137,66 +70,19 @@ class _FeesFinancePageState extends State<FeesFinancePage> {
 
   Widget _buildTeacherSalarySection() {
     return Padding(
-      padding: EdgeInsets.all(16.0),
+      padding: EdgeInsets.all(16),
       child: Column(
         children: [
-          // Summary Cards
           _buildSummaryCards(),
           SizedBox(height: 16),
-          
-          // Data Table
+
           Expanded(
-            child: DataTable(
-              headingRowColor: MaterialStateProperty.all(Color(0xFF6E8AFA)),
-              headingTextStyle: TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-              ),
-              columns: [
-                DataColumn(label: Text("Teacher")),
-                DataColumn(label: Text("Department")),
-                DataColumn(label: Text("Salary")),
-                DataColumn(label: Text("Status")),
-                DataColumn(label: Text("Actions")),
-              ],
-              rows: sampleTeacherSalaries.map((salary) {
-                return DataRow(
-                  cells: [
-                    DataCell(Text(salary.teacherName)),
-                    DataCell(Text(salary.department)),
-                    DataCell(Text("\$${salary.salary.toStringAsFixed(2)}")),
-                    DataCell(
-                      Container(
-                        padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                        decoration: BoxDecoration(
-                          color: salary.status == "Paid" 
-                              ? Color(0xFF4ECDC4) 
-                              : Color(0xFFFF6B6B),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Text(
-                          salary.status,
-                          style: TextStyle(color: Colors.white),
-                        ),
-                      ),
-                    ),
-                    DataCell(
-                      Row(
-                        children: [
-                          IconButton(
-                            icon: Icon(Icons.payments, color: Color(0xFF6E8AFA)),
-                            onPressed: () => _showSalaryPaymentSheet(salary),
-                          ),
-                          IconButton(
-                            icon: Icon(Icons.history, color: Colors.orange),
-                            onPressed: () => _showSalaryHistory(salary),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                );
-              }).toList(),
+            child: ListView.builder(
+              itemCount: sampleTeacherSalaries.length,
+              itemBuilder: (context, index) {
+                final salary = sampleTeacherSalaries[index];
+                return _buildSalaryCard(salary);
+              },
             ),
           ),
         ],
@@ -204,6 +90,160 @@ class _FeesFinancePageState extends State<FeesFinancePage> {
     );
   }
 
+  // ----------------- SEARCH BAR -----------------
+  Widget _buildSearchBar() {
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(12),
+        color: Colors.white,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: Offset(0, 5),
+          )
+        ],
+      ),
+      child: TextField(
+        controller: searchController,
+        decoration: InputDecoration(
+          hintText: "Search student by name / roll...",
+          prefixIcon: Icon(Icons.search, color: Color(0xFF6E8AFA)),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: BorderSide.none,
+          ),
+          filled: true,
+          fillColor: Colors.white,
+        ),
+      ),
+    );
+  }
+
+  // ----------------- PREMIUM CARD UI: STUDENT FEES -----------------
+  Widget _buildFeeCard(StudentFee fee) {
+    return Card(
+      elevation: 4,
+      margin: EdgeInsets.only(bottom: 14),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+      child: Padding(
+        padding: EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  fee.studentName,
+                  style: TextStyle(
+                      fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                _buildStatusTag(fee.status == "Paid"),
+              ],
+            ),
+
+            SizedBox(height: 6),
+
+            Text("Class: ${fee.classSection}",
+                style: TextStyle(fontSize: 15, color: Colors.grey[600])),
+
+            SizedBox(height: 6),
+
+            Text("Amount: ₹${fee.amount.toStringAsFixed(2)}",
+                style: TextStyle(fontSize: 16)),
+
+            SizedBox(height: 12),
+
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                IconButton(
+                  icon: Icon(Icons.payments, color: Color(0xFF6E8AFA)),
+                  onPressed: () => _showPaymentSheet(fee),
+                ),
+                IconButton(
+                  icon: Icon(Icons.picture_as_pdf, color: Colors.red),
+                  onPressed: () => _generateReceipt(fee),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // ----------------- PREMIUM CARD UI: TEACHER SALARY -----------------
+  Widget _buildSalaryCard(TeacherSalary salary) {
+    return Card(
+      elevation: 4,
+      margin: EdgeInsets.only(bottom: 14),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+      child: Padding(
+        padding: EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  salary.teacherName,
+                  style: TextStyle(
+                      fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                _buildStatusTag(salary.status == "Paid"),
+              ],
+            ),
+
+            SizedBox(height: 6),
+
+            Text("Department: ${salary.department}",
+                style: TextStyle(fontSize: 15, color: Colors.grey[600])),
+
+            SizedBox(height: 6),
+
+            Text("Salary: ₹${salary.salary.toStringAsFixed(2)}",
+                style: TextStyle(fontSize: 16)),
+
+            SizedBox(height: 12),
+
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                IconButton(
+                  icon: Icon(Icons.payments, color: Color(0xFF6E8AFA)),
+                  onPressed: () => _showSalaryPaymentSheet(salary),
+                ),
+                IconButton(
+                  icon: Icon(Icons.history, color: Colors.orange),
+                  onPressed: () => _showSalaryHistory(salary),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // ----------------- STATUS TAG -----------------
+  Widget _buildStatusTag(bool isPaid) {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      decoration: BoxDecoration(
+        color: isPaid ? Color(0xFF4ECDC4) : Color(0xFFFF6B6B),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Text(
+        isPaid ? "Paid" : "Pending",
+        style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+      ),
+    );
+  }
+
+  // ----------------- SUMMARY CARDS -----------------
   Widget _buildSummaryCards() {
     return Container(
       height: 120,
@@ -212,17 +252,18 @@ class _FeesFinancePageState extends State<FeesFinancePage> {
         crossAxisSpacing: 16,
         mainAxisSpacing: 16,
         childAspectRatio: 1.8,
+        physics: NeverScrollableScrollPhysics(),
         children: [
-          _buildSummaryCard("Total Collected", "\$42,560", Color(0xFF4ECDC4)),
-          _buildSummaryCard("Pending", "\$12,450", Color(0xFFFF6B6B)),
-          _buildSummaryCard("Salary Paid", "\$18,900", Color(0xFF6E8AFA)),
-          _buildSummaryCard("Event Expenses", "\$3,200", Color(0xFFFFA07A)),
+          _moneyCard("Total Collected", "₹42,560", Color(0xFF4ECDC4)),
+          _moneyCard("Pending", "₹12,450", Color(0xFFFF6B6B)),
+          _moneyCard("Salary Paid", "₹18,900", Color(0xFF6E8AFA)),
+          _moneyCard("Expenses", "₹3,200", Color(0xFFFFA07A)),
         ],
       ),
     );
   }
 
-  Widget _buildSummaryCard(String title, String value, Color color) {
+  Widget _moneyCard(String title, String value, Color color) {
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),
@@ -238,111 +279,44 @@ class _FeesFinancePageState extends State<FeesFinancePage> {
       child: Padding(
         padding: EdgeInsets.all(16),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(
-              title,
-              style: TextStyle(
-                fontSize: 14,
-                color: Colors.grey[600],
-              ),
-            ),
-            SizedBox(height: 4),
-            Text(
-              value,
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: color,
-              ),
-            ),
+            Text(title, style: TextStyle(fontSize: 14, color: Colors.grey)),
+            SizedBox(height: 6),
+            Text(value,
+                style: TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                    color: color)),
           ],
         ),
       ),
     );
   }
 
+  // ----------------- PAYMENT SHEETS / POPUPS -----------------
   void _showPaymentSheet(StudentFee fee) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (context) => Container(
-        padding: EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              "Process Payment",
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 16),
-            ListTile(
-              title: Text("Student: ${fee.studentName}"),
-              subtitle: Text("Class: ${fee.classSection}"),
-            ),
-            ListTile(
-              title: Text("Amount Due: \$${fee.amount.toStringAsFixed(2)}"),
-              trailing: Container(
-                padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  color: Color(0xFFFF6B6B),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Text(
-                  "Pending",
-                  style: TextStyle(color: Colors.white),
-                ),
-              ),
-            ),
-            SizedBox(height: 16),
-            TextField(
-              decoration: InputDecoration(
-                labelText: "Payment Amount",
-                border: OutlineInputBorder(),
-              ),
-              keyboardType: TextInputType.number,
-            ),
-            SizedBox(height: 16),
-            Row(
-              children: [
-                Expanded(
-                  child: ElevatedButton(
-                    onPressed: () {
-                      // Process payment
-                      Navigator.pop(context);
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Color(0xFF6E8AFA),
-                    ),
-                    child: Text("Process Payment", style: TextStyle(color: Colors.white)),
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
+      backgroundColor: Colors.white,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
+      builder: (context) =>
+          _paymentBottomSheet("Process Payment", fee.studentName, fee.amount),
     );
   }
 
   void _generateReceipt(StudentFee fee) {
-    // Generate PDF receipt
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
         title: Text("Receipt Generated"),
-        content: Text("Digital receipt for ${fee.studentName} has been generated successfully."),
+        content: Text("Digital receipt for ${fee.studentName} generated."),
         actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text("OK"),
-          ),
+          TextButton(onPressed: () => Navigator.pop(context), child: Text("OK"))
         ],
       ),
     );
@@ -352,59 +326,11 @@ class _FeesFinancePageState extends State<FeesFinancePage> {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (context) => Container(
-        padding: EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              "Process Salary Payment",
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 16),
-            ListTile(
-              title: Text("Teacher: ${salary.teacherName}"),
-              subtitle: Text("Department: ${salary.department}"),
-            ),
-            ListTile(
-              title: Text("Monthly Salary: \$${salary.salary.toStringAsFixed(2)}"),
-              trailing: Container(
-                padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  color: Color(0xFFFF6B6B),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Text(
-                  "Unpaid",
-                  style: TextStyle(color: Colors.white),
-                ),
-              ),
-            ),
-            SizedBox(height: 16),
-            Row(
-              children: [
-                Expanded(
-                  child: ElevatedButton(
-                    onPressed: () {
-                      // Process salary payment
-                      Navigator.pop(context);
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Color(0xFF6E8AFA),
-                    ),
-                    child: Text("Pay Salary", style: TextStyle(color: Colors.white)),
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
+      backgroundColor: Colors.white,
+      shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+      builder: (context) => _paymentBottomSheet(
+          "Salary Payment", salary.teacherName, salary.salary),
     );
   }
 
@@ -412,45 +338,46 @@ class _FeesFinancePageState extends State<FeesFinancePage> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text("Salary History - ${salary.teacherName}"),
-        content: Container(
-          width: double.maxFinite,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              ListTile(
-                title: Text("October 2025"),
-                subtitle: Text("\$${salary.salary.toStringAsFixed(2)} - Paid"),
-              ),
-              ListTile(
-                title: Text("September 2025"),
-                subtitle: Text("\$${salary.salary.toStringAsFixed(2)} - Paid"),
-              ),
-              ListTile(
-                title: Text("August 2025"),
-                subtitle: Text("\$${salary.salary.toStringAsFixed(2)} - Unpaid"),
-              ),
-            ],
-          ),
+        title: Text("Salary History"),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(title: Text("October 2025"), subtitle: Text("Paid")),
+            ListTile(title: Text("September 2025"), subtitle: Text("Paid")),
+            ListTile(title: Text("August 2025"), subtitle: Text("Unpaid")),
+          ],
         ),
         actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text("Close"),
-          ),
+          TextButton(onPressed: () => Navigator.pop(context), child: Text("Close"))
+        ],
+      ),
+    );
+  }
+
+  Widget _paymentBottomSheet(String title, String name, double amount) {
+    return Padding(
+      padding: EdgeInsets.fromLTRB(16, 16, 16, MediaQuery.of(context).viewInsets.bottom + 16),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(title, style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+          SizedBox(height: 16),
+          ListTile(title: Text(name), subtitle: Text("Amount: ₹$amount")),
+          SizedBox(height: 16),
+          ElevatedButton(
+              onPressed: () => Navigator.pop(context),
+              style: ElevatedButton.styleFrom(backgroundColor: Color(0xFF6E8AFA)),
+              child: Text("Confirm Payment", style: TextStyle(color: Colors.white))),
         ],
       ),
     );
   }
 }
 
-// Data Models
+// ------------------ DATA MODELS ------------------
 class StudentFee {
-  String studentName;
-  String classSection;
+  String studentName, classSection, status;
   double amount;
-  String status;
-
   StudentFee({
     required this.studentName,
     required this.classSection,
@@ -460,11 +387,8 @@ class StudentFee {
 }
 
 class TeacherSalary {
-  String teacherName;
-  String department;
+  String teacherName, department, status;
   double salary;
-  String status;
-
   TeacherSalary({
     required this.teacherName,
     required this.department,
@@ -473,13 +397,12 @@ class TeacherSalary {
   });
 }
 
-// Sample Data
+// ------------------ SAMPLE DATA ------------------
 List<StudentFee> sampleStudentFees = [
   StudentFee(studentName: "John Doe", classSection: "10-A", amount: 1200.0, status: "Pending"),
   StudentFee(studentName: "Jane Smith", classSection: "11-B", amount: 1500.0, status: "Paid"),
   StudentFee(studentName: "Robert Johnson", classSection: "12-C", amount: 1350.0, status: "Pending"),
   StudentFee(studentName: "Emily Davis", classSection: "9-A", amount: 1100.0, status: "Paid"),
-  StudentFee(studentName: "Michael Wilson", classSection: "10-B", amount: 1250.0, status: "Pending"),
 ];
 
 List<TeacherSalary> sampleTeacherSalaries = [
@@ -487,5 +410,4 @@ List<TeacherSalary> sampleTeacherSalaries = [
   TeacherSalary(teacherName: "Mr. James Smith", department: "Science", salary: 4200.0, status: "Paid"),
   TeacherSalary(teacherName: "Ms. Linda Brown", department: "English", salary: 4000.0, status: "Unpaid"),
   TeacherSalary(teacherName: "Prof. David Wilson", department: "History", salary: 3800.0, status: "Paid"),
-  TeacherSalary(teacherName: "Dr. Anna Taylor", department: "Art", salary: 3500.0, status: "Unpaid"),
 ];

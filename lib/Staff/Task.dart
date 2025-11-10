@@ -146,7 +146,7 @@ class _TeacherAssignmentManagerPageState
                 indicatorColor: const Color(0xFF1976D2),
                 tabs: const [
                   Tab(text: 'Manage'),
-                  Tab(text: 'Submissions'),
+                  Tab(text: 'Marks'),
                 ],
               ),
             ),
@@ -278,26 +278,28 @@ class _TeacherAssignmentManagerPageState
           ),
         ],
       ),
-      child: Row(
-        children: [
-          const Text('Filter: ', style: TextStyle(fontWeight: FontWeight.bold)),
-          ...['All', 'Submitted', 'Graded'].map((status) {
-            return Padding(
-              padding: const EdgeInsets.only(left: 12),
-              child: FilterChip(
-                label: Text(status),
-                selected: _selectedStatusFilter == status,
-                onSelected: (selected) => setState(() => _selectedStatusFilter = status),
-                backgroundColor: Colors.white,
-                selectedColor: const Color(0xFF3B82F6),
-                labelStyle: TextStyle(
-                  color: _selectedStatusFilter == status ? Colors.white : Colors.grey[800],
+      child: SingleChildScrollView(
+        child: Row(
+          children: [
+            const Text('Filter: ', style: TextStyle(fontWeight: FontWeight.bold)),
+            ...['All', 'Submitted', 'Graded'].map((status) {
+              return Padding(
+                padding: const EdgeInsets.only(left: 12),
+                child: FilterChip(
+                  label: Text(status),
+                  selected: _selectedStatusFilter == status,
+                  onSelected: (selected) => setState(() => _selectedStatusFilter = status),
+                  backgroundColor: Colors.white,
+                  selectedColor: const Color(0xFF3B82F6),
+                  labelStyle: TextStyle(
+                    color: _selectedStatusFilter == status ? Colors.white : Colors.grey[800],
+                  ),
                 ),
-              ),
-            );
-          }).toList(),
-        ],
-      ),
+              );
+            }).toList(),
+          ],
+        ),
+      )
     );
   }
 

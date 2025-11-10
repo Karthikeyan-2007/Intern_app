@@ -115,11 +115,17 @@ class _PrincipalDashboardPageState extends State<PrincipalDashboardPage>
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.fromLTRB(16, 20, 16, 8),
-              child: _buildChartsSection(),
+              child: _buildAttendanceChart(_attendanceData),
             ),
           ),
 
-          // ===== 5. Upcoming Events =====
+          SliverToBoxAdapter(
+            child: Padding(
+              padding:const EdgeInsets.fromLTRB(16, 20, 16, 8),
+              child: _buildPerformanceChart(_performanceData), 
+            ),
+          ),
+
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.fromLTRB(16, 20, 16, 8),
@@ -339,24 +345,6 @@ class _PrincipalDashboardPageState extends State<PrincipalDashboardPage>
           ],
         ),
       ),
-    );
-  }
-
-  // ===== 4. Charts Section =====
-  Widget _buildChartsSection() {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Expanded(
-          flex: 6,
-          child: _buildAttendanceChart(_attendanceData),
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          flex: 4,
-          child: _buildPerformanceChart(_performanceData),
-        ),
-      ],
     );
   }
 
@@ -626,44 +614,91 @@ class _PrincipalDashboardPageState extends State<PrincipalDashboardPage>
     );
   }
 
-  // ===== Quick Actions =====
   Widget _buildQuickActions() {
     final actions = [
-      {'title': 'Approve Leaves', 'icon': Icons.event_busy, 'color': Colors.orange, 'onTap': _approveLeaves},
-      {'title': 'Send Alert', 'icon': Icons.notifications_active, 'color': Colors.blue, 'onTap': _sendNotification},
-      {'title': 'View Queries', 'icon': Icons.question_answer, 'color': Colors.purple, 'onTap': _viewQueries},
-      {'title': 'Generate Report', 'icon': Icons.analytics, 'color': Colors.green, 'onTap': _generateReport},
+      {
+        'title': 'Approve Leaves',
+        'icon': Icons.event_busy,
+        'color': Colors.orange,
+        'onTap': _approveLeaves
+      },
+      {
+        'title': 'Send Alert',
+        'icon': Icons.notifications_active,
+        'color': Colors.blue,
+        'onTap': _sendNotification
+      },
+      {
+        'title': 'View Queries',
+        'icon': Icons.question_answer,
+        'color': Colors.purple,
+        'onTap': _viewQueries
+      },
+      {
+        'title': 'Generate Report',
+        'icon': Icons.analytics,
+        'color': Colors.green,
+        'onTap': _generateReport
+      },
     ];
 
-    return Wrap(
-      spacing: 12,
-      runSpacing: 12,
-      children: actions.map((action) {
-        return SizedBox(
-          width: (MediaQuery.of(context).size.width - 48) / 2 - 12,
-          child: Card(
-            elevation: 0,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-            child: InkWell(
-              onTap: action['onTap'] as void Function()?,
-              borderRadius: BorderRadius.circular(12),
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Row(
-                  children: [
-                    Icon(action['icon'] as IconData, size: 24, color: action['color'] as Color),
-                    const SizedBox(width: 12),
-                    Text(
-                      action['title'] as String,
-                      style: const TextStyle(fontWeight: FontWeight.w600),
-                    ),
-                  ],
+    return GridView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      itemCount: actions.length,
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        mainAxisSpacing: 14,
+        crossAxisSpacing: 14,
+        childAspectRatio: 1.9, // Adjust height/width ratio
+      ),
+      itemBuilder: (context, index) {
+        final action = actions[index];
+
+        return GestureDetector(
+          onTap: action['onTap'] as void Function()?,
+          child: Container(
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: [
+                BoxShadow(
+                  blurRadius: 6,
+                  offset: Offset(0, 4),
+                  color: Colors.black.withOpacity(0.08),
+                )
+              ],
+            ),
+            padding: const EdgeInsets.all(16),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: (action['color'] as Color).withOpacity(0.2),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    action['icon'] as IconData,
+                    color: action['color'] as Color,
+                    size: 24,
+                  ),
                 ),
-              ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    action['title'] as String,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w700,
+                      fontSize: 14,
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
         );
-      }).toList(),
+      },
     );
   }
 

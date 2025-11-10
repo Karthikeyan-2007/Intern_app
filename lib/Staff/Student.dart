@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:school_app/Staff/Studentview.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:intl/intl.dart';
 class TeacherStudentManagerPage extends StatefulWidget {
@@ -58,7 +59,7 @@ class _TeacherAssignmentManagerPageState
                 indicatorColor: const Color(0xFF1976D2),
                 tabs: const [
                   Tab(text: 'Approve'),
-                  Tab(text: 'Stusents'),
+                  Tab(text: 'Students'),
                 ],
               ),
             ),
@@ -123,24 +124,7 @@ class _TeacherStudentDashboardPageState
       'class': 'Grade 10 - A',
     },
   ];
-
-  final List<Map<String, dynamic>> _leaveRequests = [
-    {
-      'id': 'leave_001',
-      'student_id': 'usr_s3',
-      'reason': 'Medical appointment',
-      'date': DateTime.now().add(const Duration(days: 2)),
-      'status': 'pending',
-    }
-  ];
-
-  final List<Map<String, dynamic>> _performanceData = [
-    {'test': 'Physics Midterm', 'marks': 92.0},
-    {'test': 'Math Quiz', 'marks': 95.0},
-    {'test': 'Biology Test', 'marks': 88.0},
-    {'test': 'English Essay', 'marks': 89.0},
-  ];
-
+  
   @override
   void initState() {
     super.initState();
@@ -176,7 +160,7 @@ class _TeacherStudentDashboardPageState
       backgroundColor: const Color(0xFFF9FAFB),
       body: _selectedStudent == null
           ? _buildStudentList()
-          : _buildStudentDetail(_selectedStudent!),
+          : StudentDetailPage(student: _selectedStudent!),
     );
   }
 
@@ -278,240 +262,6 @@ class _TeacherStudentDashboardPageState
       ),
     );
   }
-
-  // 🔹 Student Detail Screen
-  Widget _buildStudentDetail(Map<String, dynamic> student) {
-    final attendancePercent = 95;
-    final leaveRequest = _leaveRequests
-        .where((r) => r['student_id'] == student['id'])
-        .toList()
-        .firstOrNull;
-
-    return CustomScrollView(
-      slivers: [
-        SliverAppBar(
-          pinned: true,
-          backgroundColor: const Color(0xFF1E3A8A),
-          foregroundColor: Colors.white,
-          title: Text(student['full_name']),
-          actions: [
-            IconButton(
-              onPressed: () => setState(() => _selectedStudent = null),
-              icon: const Icon(Icons.close),
-            ),
-          ],
-        ),
-        SliverToBoxAdapter(
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              children: [
-                _buildProfileSummary(student),
-                const SizedBox(height: 24),
-                _buildAttendanceCard(attendancePercent),
-                const SizedBox(height: 24),
-                _buildPerformanceGraph(),
-                const SizedBox(height: 24),
-                if (leaveRequest != null) _buildLeaveRequestCard(leaveRequest),
-                const SizedBox(height: 24),
-                _buildQuickActions(student),
-              ],
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildProfileSummary(Map<String, dynamic> student) => Container(
-        padding: const EdgeInsets.all(20),
-        decoration: _cardDecoration(),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text('Personal Details',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 16),
-            _buildInfoRow('Email', student['email']),
-            _buildInfoRow('Phone', student['phone']),
-            _buildInfoRow('Date of Birth', student['date_of_birth']),
-            _buildInfoRow('Class', student['class']),
-          ],
-        ),
-      );
-
-  Widget _buildAttendanceCard(int percent) => Container(
-        padding: const EdgeInsets.all(20),
-        decoration: _cardDecoration(),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text('Attendance',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 16),
-            LinearProgressIndicator(
-              value: percent / 100,
-              backgroundColor: Colors.grey[200],
-              color: Colors.green,
-              minHeight: 8,
-              borderRadius: BorderRadius.circular(4),
-            ),
-            const SizedBox(height: 8),
-            Text('$percent% attendance this month',
-                style: const TextStyle(fontWeight: FontWeight.bold)),
-          ],
-        ),
-      );
-
-  Widget _buildPerformanceGraph() {
-    final data = _performanceData
-        .map((d) => PerformanceData(d['test'] as String, d['marks'] as double))
-        .toList();
-
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: _cardDecoration(),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text('Performance Trend',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-          const SizedBox(height: 16),
-          SizedBox(
-            height: 200,
-            child: SfCartesianChart(
-              primaryXAxis: CategoryAxis(),
-              series: <CartesianSeries>[
-                LineSeries<PerformanceData, String>(
-                  dataSource: data,
-                  xValueMapper: (PerformanceData d, _) => d.test,
-                  yValueMapper: (PerformanceData d, _) => d.marks,
-                  color: const Color(0xFF3B82F6),
-                  markerSettings: const MarkerSettings(isVisible: true),
-                )
-              ],
-              tooltipBehavior: TooltipBehavior(enable: true),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildLeaveRequestCard(Map<String, dynamic> leave) => Container(
-        padding: const EdgeInsets.all(20),
-        decoration: BoxDecoration(
-          color: Colors.orange.shade50,
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: Colors.orange.shade300),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('Leave Request — Pending',
-                style: TextStyle(
-                    color: Colors.orange.shade800,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16)),
-            const SizedBox(height: 12),
-            Text('Reason: ${leave['reason']}'),
-            Text('Date: ${DateFormat('MMM d, y').format(leave['date'])}'),
-            const SizedBox(height: 16),
-            Row(
-              children: [
-                FilledButton(
-                    onPressed: () => _showSnack('Leave approved'),
-                    child: const Text('Approve')),
-                const SizedBox(width: 10),
-                OutlinedButton(
-                    onPressed: () => _showSnack('Leave rejected'),
-                    child: const Text('Reject')),
-              ],
-            )
-          ],
-        ),
-      );
-
-  Widget _buildQuickActions(Map<String, dynamic> student) {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: _cardDecoration(),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text('Quick Actions',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-          const SizedBox(height: 16),
-          Row(
-            children: [
-              _buildActionCard('Message Parent', Icons.chat_bubble, Colors.blue,
-                  () => _showSnack('Chat started')),
-                  SizedBox(width: 10,),
-              _buildActionCard('Generate Report', Icons.bar_chart, Colors.green,
-                  () => _showSnack('Report generated')),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildActionCard(
-      String title, IconData icon, Color color, VoidCallback onTap) {
-    return SizedBox(
-      width: 150,
-      child: Card(
-        elevation: 2,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        child: InkWell(
-          onTap: onTap,
-          borderRadius: BorderRadius.circular(16),
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              children: [
-                Icon(icon, size: 32, color: color),
-                const SizedBox(height: 10),
-                Text(title,
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(fontWeight: FontWeight.w600)),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  BoxDecoration _cardDecoration() => BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.06),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      );
-
-  void _showSnack(String message) {
-    ScaffoldMessenger.of(context)
-        .showSnackBar(SnackBar(content: Text(message)));
-  }
-
-  Widget _buildInfoRow(String label, String value) => Padding(
-        padding: const EdgeInsets.symmetric(vertical: 6),
-        child: Row(
-          children: [
-            SizedBox(
-                width: 120,
-                child: Text('$label:',
-                    style: const TextStyle(fontWeight: FontWeight.bold))),
-            Expanded(child: Text(value)),
-          ],
-        ),
-      );
 }
 
 class PerformanceData {

@@ -6,7 +6,8 @@ import 'Profile.dart';
 import 'Teacher.dart';
 
 class ParentNavigatorScreen extends StatefulWidget {
-  const ParentNavigatorScreen({super.key});
+  final int? selectedIndex;
+  const ParentNavigatorScreen({super.key, this.selectedIndex});
 
   @override
   _MainNavigatorScreenState createState() => _MainNavigatorScreenState();
@@ -22,6 +23,13 @@ class _MainNavigatorScreenState extends State<ParentNavigatorScreen> {
     ParentTeacherDirectoryPage(),
     ParentProfilePage(),
   ];
+
+  
+  @override
+  void initState() {
+    super.initState();
+    _currentIndex = widget.selectedIndex ?? 0;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -41,7 +49,7 @@ class _MainNavigatorScreenState extends State<ParentNavigatorScreen> {
         },
         destinations: const [
           NavigationDestination(icon: Icon(Icons.home),label: 'Home',),
-          NavigationDestination(icon: Icon(Icons.assignment),label: 'Assessments',),
+          NavigationDestination(icon: Icon(Icons.assignment),label: 'Assessment',),
           NavigationDestination(icon: Icon(Icons.fact_check), label: 'Attendance',),
           NavigationDestination(icon: Icon(Icons.group),label: 'Teachers',),
           NavigationDestination(icon: Icon(Icons.person),label: 'Profile',),

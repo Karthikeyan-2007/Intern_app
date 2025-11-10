@@ -185,8 +185,6 @@ class _ParentAttendancePageState extends State<ParentAttendancePage>
                     ],
                   ),
                   const SizedBox(height: 24),
-
-                  // Type Toggle
                   Row(
                     children: [
                       Expanded(
@@ -211,8 +209,6 @@ class _ParentAttendancePageState extends State<ParentAttendancePage>
                     ],
                   ),
                   const SizedBox(height: 20),
-
-                  // Date
                   TextField(
                     controller: _dateController,
                     readOnly: true,
@@ -255,8 +251,6 @@ class _ParentAttendancePageState extends State<ParentAttendancePage>
                     ),
                   ),
                   const SizedBox(height: 24),
-
-                  // Submit Button
                   ElevatedButton(
                     onPressed: _submitRequest,
                     style: ElevatedButton.styleFrom(
@@ -271,6 +265,7 @@ class _ParentAttendancePageState extends State<ParentAttendancePage>
                       style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
                     ),
                   ),
+                  SizedBox(height: 50,),
                 ],
               ),
             );
@@ -318,6 +313,7 @@ class _ParentAttendancePageState extends State<ParentAttendancePage>
     return Scaffold(
       backgroundColor: const Color(0xFFF8F9FE),
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         title: const Text(
           'Attendance',
           style: TextStyle(fontWeight: FontWeight.bold, fontSize: 22),
@@ -542,6 +538,7 @@ class _ParentAttendancePageState extends State<ParentAttendancePage>
       child: Row(
         children: [
           Stack(
+            alignment: Alignment.center,
             children: [
               SizedBox(
                 width: 90,
@@ -609,7 +606,7 @@ class _ParentAttendancePageState extends State<ParentAttendancePage>
         crossAxisCount: 3,
         crossAxisSpacing: 10,
         mainAxisSpacing: 10,
-        mainAxisExtent: 150,
+        mainAxisExtent: 120,
       ),
       itemCount: summaryItems.length,
       itemBuilder: (context, index) {
@@ -657,7 +654,6 @@ class _ParentAttendancePageState extends State<ParentAttendancePage>
       return DateTime(now.year, now.month, now.day - (7 - index));
     });
 
-    // Map each day to its attendance status (default: 'none' if no record)
     final dailyStatus = <DateTime, String>{};
     for (final day in last8Days) {
       final record = _attendanceRecords.firstWhere(
@@ -667,8 +663,6 @@ class _ParentAttendancePageState extends State<ParentAttendancePage>
       );
       dailyStatus[day] = record['status'] as String;
     }
-
-    // Build bar data
     final barsData = <BarChartGroupData>[];
     for (int i = 0; i < last8Days.length; i++) {
       final day = last8Days[i];

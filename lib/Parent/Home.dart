@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:school_app/Parent/Alert.dart';
+import 'package:school_app/Parent/Navigator.dart';
 import 'dart:math' as math;
-
 import 'Reports.dart';
 import 'Timetable.dart';
+import 'package:fl_chart/fl_chart.dart';
+
 
 class ParentHomePage extends StatefulWidget {
   const ParentHomePage({super.key});
@@ -104,7 +107,7 @@ class _ParentHomePageState extends State<ParentHomePage> with TickerProviderStat
                   const SizedBox(height: 20),
                   _buildQuickActions(child),
                   const SizedBox(height: 20),
-                  _buildWeeklyProgressChart(child),
+                  buildWeeklyProgressChart(child),
                   const SizedBox(height: 20),
                   _buildUpcomingEvents(),
                   const SizedBox(height: 20),
@@ -123,7 +126,7 @@ class _ParentHomePageState extends State<ParentHomePage> with TickerProviderStat
 
   Widget _buildSliverAppBar(Map<String, dynamic> child) {
     return SliverAppBar(
-      expandedHeight: 120,
+      expandedHeight: 100,
       floating: false,
       pinned: true,
       backgroundColor: Colors.white,
@@ -150,8 +153,8 @@ class _ParentHomePageState extends State<ParentHomePage> with TickerProviderStat
                   Row(
                     children: [
                       Container(
-                        width: 70,
-                        height: 70,
+                        width: 50,
+                        height: 50,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
                           color: Colors.white,
@@ -167,14 +170,14 @@ class _ParentHomePageState extends State<ParentHomePage> with TickerProviderStat
                           child: Text(
                             child['name'].toString().substring(0, 1),
                             style: TextStyle(
-                              fontSize: 32,
+                              fontSize: 25,
                               fontWeight: FontWeight.bold,
                               color: Colors.blue.shade700,
                             ),
                           ),
                         ),
                       ),
-                      const SizedBox(width: 16),
+                      const SizedBox(width: 13),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -182,7 +185,7 @@ class _ParentHomePageState extends State<ParentHomePage> with TickerProviderStat
                             Text(
                               child['name'],
                               style: const TextStyle(
-                                fontSize: 24,
+                                fontSize: 20,
                                 fontWeight: FontWeight.bold,
                                 color: Colors.white,
                               ),
@@ -191,7 +194,7 @@ class _ParentHomePageState extends State<ParentHomePage> with TickerProviderStat
                             Text(
                               child['class'],
                               style: const TextStyle(
-                                fontSize: 16,
+                                fontSize: 10,
                                 color: Colors.white70,
                               ),
                             ),
@@ -208,13 +211,15 @@ class _ParentHomePageState extends State<ParentHomePage> with TickerProviderStat
       ),
       actions: [
         IconButton(
-          onPressed: () {},
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => NotificationListPage(),
+              ),
+            );
+          },
           icon: const Icon(Icons.notifications_outlined),
-          color: Colors.black,
-        ),
-        IconButton(
-          onPressed: () {},
-          icon: const Icon(Icons.settings_outlined),
           color: Colors.black,
         ),
       ],
@@ -223,7 +228,7 @@ class _ParentHomePageState extends State<ParentHomePage> with TickerProviderStat
 
   Widget _buildChildSelector() {
     return SizedBox(
-      height: 60,
+      height: 50,
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
         itemCount: _children.length,
@@ -234,8 +239,8 @@ class _ParentHomePageState extends State<ParentHomePage> with TickerProviderStat
             onTap: () => setState(() => _activeChildIndex = index),
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 300),
-              margin: const EdgeInsets.only(right: 10),
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+              margin: const EdgeInsets.only(right: 5),
+              padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 8),
               decoration: BoxDecoration(
                 gradient: isActive
                     ? LinearGradient(
@@ -265,7 +270,7 @@ class _ParentHomePageState extends State<ParentHomePage> with TickerProviderStat
                       child: Text(
                         child['name'].toString().substring(0, 1),
                         style: TextStyle(
-                          fontSize: 18,
+                          fontSize: 15,
                           fontWeight: FontWeight.bold,
                           color: isActive ? Colors.white : Colors.blue.shade700,
                         ),
@@ -278,7 +283,7 @@ class _ParentHomePageState extends State<ParentHomePage> with TickerProviderStat
                     style: TextStyle(
                       color: isActive ? Colors.white : Colors.grey[800],
                       fontWeight: FontWeight.bold,
-                      fontSize: 16,
+                      fontSize: 13,
                     ),
                   ),
                 ],
@@ -292,14 +297,14 @@ class _ParentHomePageState extends State<ParentHomePage> with TickerProviderStat
 
   Widget _buildPerformanceOverview(Map<String, dynamic> child) {
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(15),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [Colors.blue.shade600, Colors.blue.shade600],
         ),
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
             color: Colors.purple.withOpacity(0.3),
@@ -317,7 +322,7 @@ class _ParentHomePageState extends State<ParentHomePage> with TickerProviderStat
               const Text(
                 'Overall Performance',
                 style: TextStyle(
-                  fontSize: 20,
+                  fontSize: 18,
                   fontWeight: FontWeight.bold,
                   color: Colors.white,
                 ),
@@ -338,7 +343,7 @@ class _ParentHomePageState extends State<ParentHomePage> with TickerProviderStat
               ),
             ],
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 18),
           Row(
             children: [
               Expanded(
@@ -357,19 +362,19 @@ class _ParentHomePageState extends State<ParentHomePage> with TickerProviderStat
 
   Widget _buildOverviewCard(String label, String value, IconData icon) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
         color: Colors.white24,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(10),
       ),
       child: Column(
         children: [
-          Icon(icon, color: Colors.white, size: 28),
+          Icon(icon, color: Colors.white, size: 23),
           const SizedBox(height: 8),
           Text(
             value,
             style: const TextStyle(
-              fontSize: 24,
+              fontSize: 20,
               fontWeight: FontWeight.bold,
               color: Colors.white,
             ),
@@ -377,7 +382,7 @@ class _ParentHomePageState extends State<ParentHomePage> with TickerProviderStat
           Text(
             label,
             style: const TextStyle(
-              fontSize: 14,
+              fontSize: 12,
               color: Colors.white70,
             ),
           ),
@@ -386,20 +391,26 @@ class _ParentHomePageState extends State<ParentHomePage> with TickerProviderStat
     );
   }
 
-  Widget _buildWeeklyProgressChart(Map<String, dynamic> child) {
+  Widget buildWeeklyProgressChart(Map<String, dynamic> child) {
     final progress = (child['weekly_progress'] as List).cast<num>();
     final maxValue = progress.reduce(math.max).toDouble();
-    
+
     return Container(
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(24),
+        gradient: LinearGradient(
+          colors: [
+            Colors.blue.shade50,
+            Colors.blue.shade100.withOpacity(0.3),
+          ],
+        ),
+        borderRadius: BorderRadius.circular(22),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 12,
+            spreadRadius: 2,
+            offset: const Offset(0, 6),
           ),
         ],
       ),
@@ -407,47 +418,82 @@ class _ParentHomePageState extends State<ParentHomePage> with TickerProviderStat
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Text(
-            'Weekly Progress',
+            'Weekly Performance',
             style: TextStyle(
-              fontSize: 20,
+              fontSize: 22,
               fontWeight: FontWeight.bold,
             ),
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 18),
           SizedBox(
-            height: 150,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: List.generate(progress.length, (index) {
-                final value = progress[index].toDouble();
-                final days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-                return Column(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    Container(
-                      width: 32,
-                      height: (value / maxValue) * 120,
-                      decoration: BoxDecoration(
+            height: 200,
+            child: BarChart(
+              BarChartData(
+                borderData: FlBorderData(show: false),
+                gridData: const FlGridData(show: false),
+                alignment: BarChartAlignment.spaceAround,
+                maxY: maxValue + 10,
+
+                barTouchData: BarTouchData(
+                  enabled: true,
+                  touchTooltipData: BarTouchTooltipData(
+                    tooltipPadding: const EdgeInsets.all(10),
+                    getTooltipItem: (group, groupIndex, rod, rodIndex) {
+                      return BarTooltipItem(
+                        "${progress[groupIndex]}%",
+                        const TextStyle(
+                          color: Colors.white,
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      );
+                    },
+                  ),
+                ),
+
+                titlesData: FlTitlesData(
+                  leftTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                  rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                  topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+
+                  bottomTitles: AxisTitles(
+                    sideTitles: SideTitles(
+                      showTitles: true,
+                      getTitlesWidget: (value, meta) {
+                        final days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+                        return Padding(
+                          padding: const EdgeInsets.only(top: 6),
+                          child: Text(
+                            days[value.toInt()],
+                            style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 12),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ),
+
+                barGroups: List.generate(progress.length, (index) {
+                  return BarChartGroupData(
+                    x: index,
+                    barRods: [
+                      BarChartRodData(
+                        toY: progress[index].toDouble(),
+                        width: 20,
+                        borderRadius: BorderRadius.circular(12),
                         gradient: LinearGradient(
+                          colors: [
+                            Colors.blue.shade400,
+                            Colors.purple.shade400,
+                          ],
                           begin: Alignment.bottomCenter,
                           end: Alignment.topCenter,
-                          colors: [Colors.blue.shade400, Colors.purple.shade400],
                         ),
-                        borderRadius: BorderRadius.circular(8),
                       ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      days[index],
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Colors.grey[600],
-                      ),
-                    ),
-                  ],
-                );
-              }),
+                    ],
+                  );
+                }),
+              ),
             ),
           ),
         ],
@@ -477,8 +523,8 @@ class _ParentHomePageState extends State<ParentHomePage> with TickerProviderStat
           physics: const NeverScrollableScrollPhysics(),
           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: 3,
-            crossAxisSpacing: 12,
-            mainAxisSpacing: 12,
+            crossAxisSpacing: 15,
+            mainAxisSpacing: 15,
             childAspectRatio: 1,
           ),
           itemCount: actions.length,
@@ -519,14 +565,14 @@ class _ParentHomePageState extends State<ParentHomePage> with TickerProviderStat
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(action['icon'] as IconData, size: 32, color: Colors.white),
+                    Icon(action['icon'] as IconData, size: 28, color: Colors.white),
                     const SizedBox(height: 8),
                     Text(
                       action['title'] as String,
                       textAlign: TextAlign.center,
                       style: const TextStyle(
                         fontWeight: FontWeight.w600,
-                        fontSize: 12,
+                        fontSize: 10,
                         color: Colors.white,
                       ),
                     ),
@@ -574,49 +620,54 @@ class _ParentHomePageState extends State<ParentHomePage> with TickerProviderStat
   }
 
   Widget _buildEventItem(String title, String date, Color color) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: color.withOpacity(0.3)),
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 4,
-            height: 40,
-            decoration: BoxDecoration(
-              color: color,
-              borderRadius: BorderRadius.circular(2),
+    return GestureDetector(
+      onTap: (){
+        Navigator.push(context, MaterialPageRoute(builder: (context)=> NotificationListPage()));
+      },
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 12),
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: color.withOpacity(0.1),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: color.withOpacity(0.3)),
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 4,
+              height: 40,
+              decoration: BoxDecoration(
+                color: color,
+                borderRadius: BorderRadius.circular(2),
+              ),
             ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 15,
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 15,
+                    ),
                   ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  date,
-                  style: TextStyle(
-                    fontSize: 13,
-                    color: Colors.grey[600],
+                  const SizedBox(height: 4),
+                  Text(
+                    date,
+                    style: TextStyle(
+                      fontSize: 13,
+                      color: Colors.grey[600],
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-          Icon(Icons.arrow_forward_ios, size: 16, color: color),
-        ],
+            Icon(Icons.arrow_forward_ios, size: 16, color: color),
+          ],
+        ),
       ),
     );
   }
@@ -639,7 +690,7 @@ class _ParentHomePageState extends State<ParentHomePage> with TickerProviderStat
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Text(
-            'Recent Activity',
+            'Recent view',
             style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
@@ -659,97 +710,70 @@ class _ParentHomePageState extends State<ParentHomePage> with TickerProviderStat
   }
 
   Widget _buildActivityItem(Map<String, dynamic> activity) {
-    Color iconColor;
-    IconData icon;
-    Color bgColor;
+    Color iconColor = Colors.orange;
+    IconData icon = Icons.access_time;
+    Color bgColor = Colors.orange.shade50;
     
-    switch (activity['type']) {
-      case 'test_graded':
-        icon = Icons.assignment_turned_in;
-        iconColor = Colors.green;
-        bgColor = Colors.green.shade50;
-        break;
-      case 'attendance':
-        icon = Icons.access_time;
-        iconColor = Colors.orange;
-        bgColor = Colors.orange.shade50;
-        break;
-      case 'note_uploaded':
-        icon = Icons.picture_as_pdf;
-        iconColor = Colors.red;
-        bgColor = Colors.red.shade50;
-        break;
-      case 'assignment':
-        icon = Icons.assignment;
-        iconColor = Colors.blue;
-        bgColor = Colors.blue.shade50;
-        break;
-      case 'achievement':
-        icon = Icons.emoji_events;
-        iconColor = Colors.amber;
-        bgColor = Colors.amber.shade50;
-        break;
-      default:
-        icon = Icons.info;
-        iconColor = Colors.grey;
-        bgColor = Colors.grey.shade50;
-    }
-
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: bgColor,
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 48,
-            height: 48,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              shape: BoxShape.circle,
+    return GestureDetector(
+      onTap: (){
+        Navigator.push(context, MaterialPageRoute(builder: (context)=> ParentNavigatorScreen(selectedIndex: 1,)));
+      },
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 12),
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: bgColor,
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 48,
+              height: 48,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                shape: BoxShape.circle,
+              ),
+              child: Icon(icon, size: 24, color: iconColor),
             ),
-            child: Icon(icon, size: 24, color: iconColor),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  activity['title'],
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 15,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                if (activity['score'] != null)
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
                   Text(
-                    'Score: ${activity['score']}',
-                    style: TextStyle(
-                      color: iconColor,
-                      fontWeight: FontWeight.w600,
+                    activity['title'],
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 15,
                     ),
                   ),
-                if (activity['details'] != null)
-                  Text(
-                    activity['details'],
-                    style: TextStyle(color: Colors.grey[600]),
-                  ),
-              ],
+                  const SizedBox(height: 4),
+                  if (activity['score'] != null)
+                    Text(
+                      'Score: ${activity['score']}',
+                      style: TextStyle(
+                        color: iconColor,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  if (activity['details'] != null)
+                    Text(
+                      activity['details'],
+                      style: TextStyle(color: Colors.grey[600]),
+                    ),
+                ],
+              ),
             ),
-          ),
-          Text(
-            activity['time'],
-            style: TextStyle(
-              fontSize: 12,
-              color: Colors.grey[600],
+            Text(
+              activity['time'],
+              style: TextStyle(
+                fontSize: 12,
+                color: Colors.grey[600],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

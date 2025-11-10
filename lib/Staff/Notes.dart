@@ -13,17 +13,13 @@ class _TeacherNotesUploadPageState extends State<TeacherNotesUploadPage> {
 
   String _selectedClass = 'Grade 10 - A';
   String _selectedSubject = 'Mathematics';
-  String _visibility = 'class';
-  bool _isPublishing = false;
   bool _showPreview = false;
 
   final List<String> _attachedFiles = [];
-
-  final List<String> _classes = ['Grade 10 - A', 'Grade 10 - B', 'Grade 11 - A'];
+  final List<String> _classes = ['Grade 10 - A', 'Grade 10 - B'];
   final Map<String, List<String>> _subjectsByClass = {
     'Grade 10 - A': ['Mathematics', 'Physics', 'English'],
-    'Grade 10 - B': ['Mathematics', 'Chemistry', 'Biology'],
-    'Grade 11 - A': ['Calculus', 'Physics', 'Computer Science'],
+    'Grade 10 - B': ['Biology', 'Chemistry', 'Computer Science'],
   };
 
   @override
@@ -34,287 +30,269 @@ class _TeacherNotesUploadPageState extends State<TeacherNotesUploadPage> {
   }
 
   void _addAttachment() {
-    setState(() => _attachedFiles.add('chapter_3_notes.pdf'));
-  }
-
-  void _removeAttachment(String file) {
-    setState(() => _attachedFiles.remove(file));
-  }
-
-  Future<void> _publishNote() async {
-    if (_titleController.text.trim().isEmpty || _descController.text.trim().isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please fill all required fields')),
-      );
-      return;
-    }
-
-    setState(() => _isPublishing = true);
-    await Future.delayed(const Duration(seconds: 1));
-
-    if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Notes published successfully!'),
-          backgroundColor: Colors.green,
-        ),
-      );
-      setState(() {
-        _isPublishing = false;
-        _titleController.clear();
-        _descController.clear();
-        _attachedFiles.clear();
-        _showPreview = false;
-      });
-    }
+    setState(() => _attachedFiles.add("example_notes.pdf"));
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF9FAFB),
+      backgroundColor: const Color(0xFFEFF3F9),
       appBar: AppBar(
+        elevation: 0,
+        backgroundColor: Colors.transparent,
+        foregroundColor: Colors.black,
         title: const Text(
-          'Upload Notes',
-          style: TextStyle(fontWeight: FontWeight.bold),
+          "Upload Notes",
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 22,
+          ),
         ),
-        backgroundColor: Colors.white,
-        foregroundColor: const Color(0xFF1E3A8A),
-        elevation: 0.4,
       ),
+
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: _isPublishing
-            ? null
-            : _showPreview
-                ? _publishNote
-                : () => setState(() => _showPreview = true),
-        icon: _isPublishing
-            ? const SizedBox(
-                width: 20,
-                height: 20,
-                child: CircularProgressIndicator(
-                    strokeWidth: 2, valueColor: AlwaysStoppedAnimation(Colors.white)))
-            : Icon(_showPreview ? Icons.cloud_upload_rounded : Icons.remove_red_eye_rounded),
-        label: Text(_isPublishing
-            ? 'Publishing...'
-            : _showPreview
-                ? 'Publish'
-                : 'Preview'),
-        backgroundColor: const Color(0xFF2563EB),
+        backgroundColor: const Color(0xFF0059FF),
+        elevation: 5,
+        onPressed: () {
+          setState(() => _showPreview = !_showPreview);
+        },
+        icon: Icon(_showPreview ? Icons.arrow_back : Icons.remove_red_eye_rounded),
+        label: Text(_showPreview ? "Back to Edit" : "Preview",
+            style: const TextStyle(fontWeight: FontWeight.bold)),
       ),
+
       body: AnimatedSwitcher(
-        duration: const Duration(milliseconds: 300),
-        child: _showPreview ? _buildPreview() : _buildForm(),
+        duration: const Duration(milliseconds: 350),
+        child: _showPreview ? _previewUI() : _formUI(),
       ),
     );
   }
-
-  Widget _buildForm() {
+  Widget _formUI() {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
         children: [
-          _sectionCard(
-            title: 'Class & Subject',
-            child: Row(
-              children: [
-                Expanded(
-                  child: DropdownButtonFormField<String>(
-                    value: _selectedClass,
-                    items: _classes
-                        .map((c) => DropdownMenuItem(value: c, child: Text(c)))
-                        .toList(),
-                    onChanged: (val) {
-                      if (val != null) {
-                        setState(() {
-                          _selectedClass = val;
-                          _selectedSubject = _subjectsByClass[val]!.first;
-                        });
-                      }
-                    },
-                    decoration: const InputDecoration(labelText: 'Class', border: OutlineInputBorder()),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: DropdownButtonFormField<String>(
-                    value: _selectedSubject,
-                    items: (_subjectsByClass[_selectedClass] ?? [])
-                        .map((s) => DropdownMenuItem(value: s, child: Text(s)))
-                        .toList(),
-                    onChanged: (val) => setState(() => _selectedSubject = val!),
-                    decoration: const InputDecoration(labelText: 'Subject', border: OutlineInputBorder()),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 16),
-          _sectionCard(
-            title: 'Note Content',
+          _frostedCard(
+            title: "Class & Subject",
             child: Column(
               children: [
-                TextField(
-                  controller: _titleController,
-                  decoration: const InputDecoration(labelText: 'Title', border: OutlineInputBorder()),
-                ),
+                _dropDown("Class", _selectedClass, _classes, (val) {
+                  setState(() {
+                    _selectedClass = val!;
+                    _selectedSubject = _subjectsByClass[val]!.first;
+                  });
+                }),
                 const SizedBox(height: 12),
-                TextField(
-                  controller: _descController,
-                  maxLines: 8,
-                  decoration: const InputDecoration(
-                    labelText: 'Description',
-                    border: OutlineInputBorder(),
-                    helperText: 'Include explanations, examples or diagrams',
-                  ),
+                _dropDown(
+                  "Subject",
+                  _selectedSubject,
+                  _subjectsByClass[_selectedClass]!,
+                  (val) => setState(() => _selectedSubject = val!),
                 ),
               ],
             ),
           ),
+
           const SizedBox(height: 16),
-          _sectionCard(
-            title: 'Attachments',
+
+          _frostedCard(
+            title: "Note Details",
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _inputField("Title", _titleController),
+                const SizedBox(height: 12),
+                _inputField("Description - Add details or instructions",
+                    _descController, maxLines: 5),
+              ],
+            ),
+          ),
+
+          const SizedBox(height: 16),
+
+          _frostedCard(
+            title: "Attachments",
             child: Column(
               children: [
                 OutlinedButton.icon(
                   onPressed: _addAttachment,
                   icon: const Icon(Icons.attach_file),
-                  label: const Text('Attach File'),
+                  label: const Text("Add Attachment"),
+                  style: OutlinedButton.styleFrom(
+                      side: const BorderSide(color: Colors.blueAccent),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14),
+                      )),
                 ),
-                if (_attachedFiles.isNotEmpty) ...[
-                  const SizedBox(height: 8),
-                  Wrap(
-                    spacing: 8,
-                    runSpacing: 8,
-                    children: _attachedFiles
-                        .map((file) => Chip(
-                              label: Text(file),
-                              onDeleted: () => _removeAttachment(file),
-                              deleteIcon: const Icon(Icons.close, size: 16),
-                            ))
-                        .toList(),
+                if (_attachedFiles.isNotEmpty)
+                  ..._attachedFiles.map(
+                    (file) => Container(
+                      padding: const EdgeInsets.all(8),
+                      margin: const EdgeInsets.only(top: 6),
+                      decoration: BoxDecoration(
+                        color: Colors.blue.shade50,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Row(
+                        children: [
+                          const Icon(Icons.picture_as_pdf_rounded, color: Colors.blue),
+                          const SizedBox(width: 10),
+                          Expanded(child: Text(file)),
+                          GestureDetector(
+                            onTap: () => setState(() => _attachedFiles.remove(file)),
+                            child: const Icon(Icons.close, color: Colors.redAccent),
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
-                ]
               ],
             ),
           ),
-          const SizedBox(height: 16),
-          _sectionCard(
-            title: 'Visibility',
-            child: Column(
-              children: [
-                RadioListTile<String>(
-                  value: 'class',
-                  groupValue: _visibility,
-                  onChanged: (val) => setState(() => _visibility = val!),
-                  title: const Text('Only this class'),
-                  subtitle: Text('Visible to students in $_selectedClass'),
-                ),
-                RadioListTile<String>(
-                  value: 'school',
-                  groupValue: _visibility,
-                  onChanged: (val) => setState(() => _visibility = val!),
-                  title: const Text('Entire school'),
-                  subtitle: const Text('All teachers and students in school'),
-                ),
-                RadioListTile<String>(
-                  value: 'public',
-                  groupValue: _visibility,
-                  onChanged: (val) => setState(() => _visibility = val!),
-                  title: const Text('Public'),
-                  subtitle: const Text('Anyone with the link (use cautiously)'),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 80),
+
+          const SizedBox(height: 100),
         ],
       ),
     );
   }
 
-  Widget _buildPreview() {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
-      child: _sectionCard(
-        title: 'Preview Note',
+  ///----------------------------
+  /// PREVIEW UI SECTION
+  ///----------------------------
+  Widget _previewUI() {
+    return Center(
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 300),
+        padding: const EdgeInsets.all(18),
+        margin: const EdgeInsets.all(16),
+        width: double.infinity,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(22),
+          boxShadow: [
+            BoxShadow(
+              blurRadius: 14,
+              color: Colors.black12.withOpacity(0.07),
+              offset: const Offset(0, 4),
+            )
+          ],
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              children: [
-                Chip(
-                  label: Text(_selectedSubject),
-                  backgroundColor: Colors.blue.shade50,
-                  labelStyle: const TextStyle(color: Color(0xFF2563EB)),
-                ),
-                const Spacer(),
-                Text(_selectedClass, style: TextStyle(color: Colors.grey[700])),
-              ],
+            _infoChip(_selectedSubject),
+            const SizedBox(height: 10),
+            Text(
+              _titleController.text.trim().isEmpty
+                  ? "Untitled Note"
+                  : _titleController.text,
+              style: const TextStyle(
+                fontSize: 22,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF002366),
+              ),
             ),
             const SizedBox(height: 12),
+
             Text(
-              _titleController.text,
-              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              _descController.text.trim().isEmpty
+                  ? "No description added."
+                  : _descController.text,
+              style: const TextStyle(
+                fontSize: 16,
+                color: Colors.black87,
+                height: 1.5,
+              ),
             ),
-            const SizedBox(height: 10),
-            Text(_descController.text),
-            if (_attachedFiles.isNotEmpty) ...[
-              const SizedBox(height: 12),
-              const Text('Attachments:', style: TextStyle(fontWeight: FontWeight.bold)),
-              const SizedBox(height: 6),
-              ..._attachedFiles.map((f) => Text('📄 $f')).toList(),
-            ],
-            const Divider(height: 24),
-            Row(
-              children: [
-                Icon(
-                  _visibility == 'class'
-                      ? Icons.lock
-                      : _visibility == 'school'
-                          ? Icons.school
-                          : Icons.public,
-                  size: 18,
-                  color: Colors.grey[600],
-                ),
-                const SizedBox(width: 8),
-                Text(
-                  _visibility == 'class'
-                      ? 'Visible to $_selectedClass'
-                      : _visibility == 'school'
-                          ? 'Visible to entire school'
-                          : 'Publicly accessible',
-                  style: TextStyle(color: Colors.grey[700]),
-                ),
-              ],
-            ),
+
+            const SizedBox(height: 12),
+            if (_attachedFiles.isNotEmpty)
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text("📎 Attachments",
+                      style: TextStyle(fontWeight: FontWeight.bold)),
+                  ..._attachedFiles.map((f) => Text("• $f")).toList()
+                ],
+              ),
           ],
         ),
       ),
     );
   }
 
-  Widget _sectionCard({required String title, required Widget child}) {
+  ///----------------------------
+  /// UI SMALL COMPONENTS
+  ///----------------------------
+
+  Widget _dropDown(String label, String selected, List<String> items, Function(String?) onChanged) {
+    return DropdownButtonFormField(
+      value: selected,
+      decoration: _inputDecoration(label),
+      onChanged: onChanged,
+      items: items.map((v) => DropdownMenuItem(value: v, child: Text(v))).toList(),
+    );
+  }
+
+  Widget _inputField(String label, TextEditingController c, {int maxLines = 1}) {
+    return TextField(
+      controller: c,
+      maxLines: maxLines,
+      decoration: _inputDecoration(label),
+    );
+  }
+
+  InputDecoration _inputDecoration(String label) {
+    return InputDecoration(
+      labelText: label,
+      filled: true,
+      fillColor: Colors.white.withOpacity(0.7),
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(14),
+        borderSide: BorderSide.none,
+      ),
+    );
+  }
+
+  Widget _frostedCard({required String title, required Widget child}) {
     return Container(
-      width: double.infinity,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(20),
+        gradient: LinearGradient(
+          colors: [
+            Colors.white.withOpacity(0.9),
+            Colors.white.withOpacity(0.7),
+          ],
+        ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 8,
-            offset: const Offset(0, 4),
+            color: Colors.black.withOpacity(0.08),
+            blurRadius: 15,
+            spreadRadius: 2,
+            offset: const Offset(0, 3),
           ),
         ],
       ),
-      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text(title,
-            style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 16, color: Color(0xFF1E3A8A))),
-        const SizedBox(height: 12),
-        child
-      ]),
+      child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(title,
+                style: const TextStyle(
+                    fontSize: 18, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 12),
+            child
+          ]),
+    );
+  }
+
+  Widget _infoChip(String label) {
+    return Chip(
+      padding: const EdgeInsets.all(6),
+      label: Text(label,
+          style: const TextStyle(
+              fontWeight: FontWeight.bold, color: Colors.white)),
+      backgroundColor: Colors.blueAccent,
     );
   }
 }

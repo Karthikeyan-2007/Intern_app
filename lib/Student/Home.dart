@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:school_app/Student/Alert.dart';
 import 'package:school_app/Student/Grades.dart';
+import 'package:school_app/Student/Navigator.dart';
 import 'package:school_app/Student/Subject.dart';
 import 'package:school_app/Student/notes.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class StudentHomePage extends StatefulWidget {
   const StudentHomePage({super.key});
@@ -33,8 +34,8 @@ class _StudentHomePageState extends State<StudentHomePage> with SingleTickerProv
 
   final List<Map<String, dynamic>> _recentActivities = [
     {'title': 'Math Assignment', 'subtitle': 'Due tomorrow at 11:59 PM', 'icon': Icons.assignment, 'color': Color(0xFFFF6B6B)},
-    {'title': 'Science Quiz Results', 'subtitle': 'You scored 92%', 'icon': Icons.science, 'color': Color(0xFF4ECDC4)},
-    {'title': 'Parent-Teacher Meeting', 'subtitle': 'Scheduled for Friday, 3 PM', 'icon': Icons.people, 'color': Color(0xFF95E1D3)},
+    {'title': 'science Assignment', 'subtitle': 'Due tomorrow at 1:20 PM', 'icon': Icons.science, 'color': Color(0xFF4ECDC4)},
+    {'title': 'Physics Assignment', 'subtitle': 'Due tomorrow at 4:00 PM', 'icon': Icons.assignment, 'color': Color(0xFF95E1D3)},
   ];
 
   final List<Map<String, dynamic>> _quickActions = [
@@ -60,23 +61,6 @@ class _StudentHomePageState extends State<StudentHomePage> with SingleTickerProv
   void dispose() {
     _animationController.dispose();
     super.dispose();
-  }
-
-  Future<void> _launchUrl(String url) async {
-    final cleanUrl = url.trim();
-    if (await canLaunchUrl(Uri.parse(cleanUrl))) {
-      await launchUrl(Uri.parse(cleanUrl));
-    } else {
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Could not open: $cleanUrl'),
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          ),
-        );
-      }
-    }
   }
 
   @override
@@ -207,32 +191,15 @@ class _StudentHomePageState extends State<StudentHomePage> with SingleTickerProv
         ),
       ),
       actions: [
-        Stack(
-          children: [
-            Container(
-              margin: EdgeInsets.only(right: 8),
-              child: IconButton(
-                onPressed: () {},
-                icon: Icon(Icons.notifications_rounded, color: Colors.white),
-                tooltip: "Notifications",
-              ),
-            ),
-            if (_unreadMessages > 0)
-              Positioned(
-                right: 12,
-                top: 8,
-                child: Container(
-                  padding: EdgeInsets.all(4),
-                  decoration: BoxDecoration(
-                    color: Color(0xFFFF6B6B),
-                    shape: BoxShape.circle,
-                    boxShadow: [BoxShadow(color: Color(0xFFFF6B6B).withOpacity(0.5), blurRadius: 4)],
-                  ),
-                  constraints: BoxConstraints(minWidth: 16, minHeight: 16),
-                  child: Text('$_unreadMessages', style: TextStyle(color: Colors.white, fontSize: 8, fontWeight: FontWeight.bold), textAlign: TextAlign.center),
-                ),
-              ),
-          ],
+        Container(
+          margin: EdgeInsets.only(right: 8),
+          child: IconButton(
+            onPressed: () {
+              Navigator.push(context, MaterialPageRoute(builder: (context)=>NotificationListPage()));
+            },
+            icon: Icon(Icons.notifications_rounded, color: Colors.white),
+            tooltip: "Notifications",
+          ),
         ),
         Container(
           margin: EdgeInsets.only(right: 16),
@@ -341,42 +308,47 @@ class _StudentHomePageState extends State<StudentHomePage> with SingleTickerProv
   }
 
   Widget _buildPremiumActivityItem(String title, String subtitle, IconData icon, Color color) {
-    return Container(
-      margin: EdgeInsets.only(bottom: 10),
-      padding: EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.centerLeft,
-          end: Alignment.centerRight,
-          colors: [color.withOpacity(0.08), color.withOpacity(0.02)],
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(context, MaterialPageRoute(builder: (context)=> StudentNavigatorScreen(selectedIndex: 1,)));
+      },
+      child: Container(
+        margin: EdgeInsets.only(bottom: 10),
+        padding: EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.centerLeft,
+            end: Alignment.centerRight,
+            colors: [color.withOpacity(0.08), color.withOpacity(0.02)],
+          ),
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: color.withOpacity(0.15)),
         ),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: color.withOpacity(0.15)),
-      ),
-      child: Row(
-        children: [
-          Container(
-            padding: EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              gradient: LinearGradient(colors: [color, color.withOpacity(0.7)]),
-              shape: BoxShape.circle,
-              boxShadow: [BoxShadow(color: color.withOpacity(0.3), blurRadius: 8, offset: Offset(0, 4))],
+        child: Row(
+          children: [
+            Container(
+              padding: EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(colors: [color, color.withOpacity(0.7)]),
+                shape: BoxShape.circle,
+                boxShadow: [BoxShadow(color: color.withOpacity(0.3), blurRadius: 8, offset: Offset(0, 4))],
+              ),
+              child: Icon(icon, size: 18, color: Colors.white),
             ),
-            child: Icon(icon, size: 18, color: Colors.white),
-          ),
-          SizedBox(width: 13),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(title, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Color(0xFF2D3436))),
-                SizedBox(height: 4),
-                Text(subtitle, style: TextStyle(color: Colors.grey[600], fontSize: 13)),
-              ],
+            SizedBox(width: 13),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(title, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Color(0xFF2D3436))),
+                  SizedBox(height: 4),
+                  Text(subtitle, style: TextStyle(color: Colors.grey[600], fontSize: 13)),
+                ],
+              ),
             ),
-          ),
-          Icon(Icons.arrow_forward_ios_rounded, size: 18, color: color),
-        ],
+            Icon(Icons.arrow_forward_ios_rounded, size: 18, color: color),
+          ],
+        ),
       ),
     );
   }
@@ -485,20 +457,6 @@ class _StudentHomePageState extends State<StudentHomePage> with SingleTickerProv
             color: Color(0xFFFFBE0B),
             content: ['National Blue Ribbon School 2020', 'State Science Olympiad Champions 2022', '98% College Acceptance Rate', '15 National Merit Scholars (2023)'],
           ),
-          _buildPremiumActionCard(
-            title: 'Staff Directory',
-            icon: Icons.people_rounded,
-            subtitle: 'Contact teachers and administration',
-            color: Color(0xFF00B894),
-            onTap: () => _launchUrl('https://your-school.com/staff-directory'),
-          ),
-          _buildPremiumActionCard(
-            title: 'School Policies',
-            icon: Icons.description_rounded,
-            subtitle: 'Code of conduct, academic policies',
-            color: Color(0xFF0984E3),
-            onTap: () => _launchUrl('https://your-school.com/policies'),
-          ),
           _buildPremiumInfoCard(
             title: 'Contact Us',
             icon: Icons.contact_mail_rounded,
@@ -548,52 +506,6 @@ class _StudentHomePageState extends State<StudentHomePage> with SingleTickerProv
     );
   }
 
-  Widget _buildPremiumActionCard({required String title, required IconData icon, required String subtitle, required Color color, required VoidCallback onTap}) {
-    return Container(
-      margin: EdgeInsets.only(bottom: 16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(24),
-        boxShadow: [BoxShadow(color: color.withOpacity(0.1), blurRadius: 15, offset: Offset(0, 8))],
-        border: Border.all(color: color.withOpacity(0.15)),
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: onTap,
-          borderRadius: BorderRadius.circular(24),
-          child: Padding(
-            padding: EdgeInsets.all(20),
-            child: Row(
-              children: [
-                Container(
-                  padding: EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(colors: [color, color.withOpacity(0.7)]),
-                    borderRadius: BorderRadius.circular(14),
-                    boxShadow: [BoxShadow(color: color.withOpacity(0.3), blurRadius: 8, offset: Offset(0, 4))],
-                  ),
-                  child: Icon(icon, color: Colors.white, size: 20),
-                ),
-                SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(title, style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF2D3436))),
-                      SizedBox(height: 4),
-                      Text(subtitle, style: TextStyle(fontSize: 13, color: Colors.grey[600])),
-                    ],
-                  ),
-                ),
-                Icon(Icons.arrow_forward_ios_rounded, size: 18, color: color),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
   Widget _buildStatCard(String title, String value, IconData icon) {
     return Container(
       padding: const EdgeInsets.all(14),
